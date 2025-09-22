@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kasparex UaaS Hub</title>
+    <style>
+      html,body{margin:0;height:100%}
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+      header{padding:14px 18px;background:#0a0f14;color:#fff}
+      main{padding:24px}
+      .card{border:1px solid #e5e7eb;border-radius:12px;padding:20px;max-width:820px}
+      .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+      iframe{width:100%;height:520px;border:0;border-radius:12px}
+      .muted{color:#6b7280}
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Kasparex UaaS Hub</strong> — demo preview
+    </header>
+    <main>
+      <div class="grid">
+        <div class="card">
+          <h3>Widget demo (subscription)</h3>
+          <p class="muted">This is the embeddable widget other projects can copy‑paste.</p>
+          <div id="kasparex-widget"
+               data-tenant="demo-tenant"
+               data-widget="subscription"
+               data-token="KREX"
+               data-plan="krex-prime"></div>
+        </div>
+        <div class="card">
+          <h3>Partner embed snippet</h3>
+          <pre><code>&lt;script src="https://hub.github.io/uaas-web/embed.js" async&gt;&lt;/script&gt;
+&lt;div id="kasparex-widget"
+     data-tenant="YOUR_TENANT"
+     data-widget="subscription"
+     data-token="KREX"
+     data-plan="krex-prime"&gt;&lt;/div&gt;</code></pre>
+          <p class="muted">When production is live you’ll switch the script URL to https://app.kasparex.com/embed.js</p>
+        </div>
+      </div>
+    </main>
+    <script src="./embed.js" defer></script>
+  </body>
+</html>
