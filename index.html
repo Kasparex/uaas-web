@@ -3,46 +3,715 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Kasparex UaaS Hub</title>
+    <title>Multi-Chain dApp - Kaspa & EVM</title>
     <style>
-      html,body{margin:0;height:100%}
-      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-      header{padding:14px 18px;background:#0a0f14;color:#fff}
-      main{padding:24px}
-      .card{border:1px solid #e5e7eb;border-radius:12px;padding:20px;max-width:820px}
-      .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-      .muted{color:#6b7280}
-      pre{white-space:pre-wrap;word-break:break-word}
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      
+      .app {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+      }
+      
+      .logo {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+      }
+      
+      .subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 16px;
+      }
+      
+      .wallet-section {
+        margin-bottom: 30px;
+      }
+      
+      .status {
+        padding: 12px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .status.disconnected {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+      
+      .status.connected {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      
+      .wallet-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      
+      .btn {
+        background: #0097b2;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+      }
+      
+      .btn:hover {
+        background: #007a8a;
+        transform: translateY(-2px);
+      }
+      
+      .btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      .btn.kaspa {
+        background: #ff6b35;
+      }
+      
+      .btn.kaspa:hover {
+        background: #e55a2b;
+      }
+      
+      .btn.evm {
+        background: #627eea;
+      }
+      
+      .btn.evm:hover {
+        background: #4f63d2;
+      }
+      
+      .btn.secondary {
+        background: #6b7280;
+      }
+      
+      .btn.secondary:hover {
+        background: #4b5563;
+      }
+      
+      .address {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 12px;
+        word-break: break-all;
+        margin-top: 8px;
+        padding: 8px;
+        background: #f3f4f6;
+        border-radius: 6px;
+      }
+      
+      .balance {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #666;
+      }
+      
+      .transaction-section {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 30px;
+        margin-top: 30px;
+      }
+      
+      .transaction-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .tab {
+        flex: 1;
+        padding: 12px;
+        background: #f9fafb;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .tab.active {
+        background: #0097b2;
+        color: white;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
+      }
+      
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .input-group input, .input-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+      
+      .input-group input:focus, .input-group select:focus {
+        outline: none;
+        border-color: #0097b2;
+        box-shadow: 0 0 0 3px rgba(0, 151, 178, 0.1);
+      }
+      
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      .success {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      
+      .error {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      
+      .token-info {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+      }
     </style>
     <script src="./sdk.js"></script>
-    <script src="./embed.js" defer></script>
   </head>
   <body>
-    <header>
-      <strong>Kasparex UaaS Hub</strong> — demo preview
-    </header>
-    <main>
-      <div class="grid">
-        <div class="card">
-          <h3>Widget demo (subscription)</h3>
-          <p class="muted">This is the embeddable widget other projects can copy‑paste.</p>
-          <div id="kasparex-widget"
-               data-tenant="demo-tenant"
-               data-widget="subscription"
-               data-token="KREX"
-               data-plan="krex-prime"></div>
+    <div class="app">
+      <div class="logo">🚀 Multi-Chain dApp</div>
+      <div class="subtitle">Kaspa & EVM transactions in one place</div>
+      
+      <div class="wallet-section">
+        <div id="status" class="status disconnected">
+          🔌 No wallet connected
         </div>
-        <div class="card">
-          <h3>Partner embed snippet</h3>
-          <pre><code>&lt;script src="https://kasparex.github.io/uaas-web/embed.js" async&gt;&lt;/script&gt;
-&lt;div id="kasparex-widget"
-     data-tenant="YOUR_TENANT"
-     data-widget="subscription"
-     data-token="KREX"
-     data-plan="krex-prime"&gt;&lt;/div&gt;</code></pre>
-          <p class="muted">When production is live you’ll switch the script URL to https://app.kasparex.com/embed.js</p>
+        
+        <div class="wallet-buttons">
+          <button id="connectKaspaBtn" class="btn kaspa">
+            🔗 Connect KasWare
+          </button>
+          <button id="connectEvmBtn" class="btn evm">
+            🦊 Connect MetaMask
+          </button>
+        </div>
+        
+        <button id="disconnectBtn" class="btn secondary" style="display: none;">
+          Disconnect
+        </button>
+        
+        <div id="walletInfo" style="display: none;">
+          <div class="address" id="walletAddress"></div>
+          <div class="balance" id="walletBalance"></div>
         </div>
       </div>
-    </main>
+      
+      <div class="transaction-section">
+        <h3 style="margin-bottom: 20px; color: #374151;">Make Transactions</h3>
+        
+        <div class="transaction-tabs">
+          <button class="tab active" data-tab="kaspa">Kaspa (KAS)</button>
+          <button class="tab" data-tab="krc20">KRC-20 Tokens</button>
+          <button class="tab" data-tab="evm">EVM (ETH)</button>
+        </div>
+        
+        <!-- Kaspa Transaction -->
+        <div id="kaspa-tab" class="tab-content active">
+          <div class="input-group">
+            <label for="kaspaRecipient">Recipient Address</label>
+            <input 
+              type="text" 
+              id="kaspaRecipient" 
+              placeholder="kaspa:qq..."
+              value="kaspa:qqexample123456789"
+            />
+          </div>
+          
+          <div class="input-group">
+            <label for="kaspaAmount">Amount (KAS)</label>
+            <input 
+              type="number" 
+              id="kaspaAmount" 
+              placeholder="0.001"
+              value="0.001"
+              step="0.001"
+              min="0"
+            />
+          </div>
+          
+          <div class="input-group">
+            <label for="kaspaFeeRate">Fee Rate (sompi/byte)</label>
+            <input 
+              type="number" 
+              id="kaspaFeeRate" 
+              placeholder="1"
+              value="1"
+              min="1"
+            />
+          </div>
+          
+          <button id="sendKaspaBtn" class="btn kaspa" disabled>
+            Send KAS Transaction
+          </button>
+        </div>
+        
+        <!-- KRC-20 Token Transaction -->
+        <div id="krc20-tab" class="tab-content">
+          <div class="input-group">
+            <label for="krc20Token">Token</label>
+            <select id="krc20Token">
+              <option value="krex">KREX</option>
+              <option value="usdt">USDT</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="krc20Recipient">Recipient Address</label>
+            <input 
+              type="text" 
+              id="krc20Recipient" 
+              placeholder="kaspa:qq..."
+              value="kaspa:qqexample123456789"
+            />
+          </div>
+          
+          <div class="input-group">
+            <label for="krc20Amount">Amount</label>
+            <input 
+              type="number" 
+              id="krc20Amount" 
+              placeholder="100"
+              value="100"
+              step="0.001"
+              min="0"
+            />
+          </div>
+          
+          <button id="sendKrc20Btn" class="btn kaspa" disabled>
+            Send KRC-20 Token
+          </button>
+          
+          <div class="token-info">
+            💡 KRC-20 tokens are native to Kaspa network and require KasWare wallet
+          </div>
+        </div>
+        
+        <!-- EVM Transaction -->
+        <div id="evm-tab" class="tab-content">
+          <div class="input-group">
+            <label for="evmRecipient">Recipient Address</label>
+            <input 
+              type="text" 
+              id="evmRecipient" 
+              placeholder="0x..."
+              value="0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6"
+            />
+          </div>
+          
+          <div class="input-group">
+            <label for="evmAmount">Amount (ETH)</label>
+            <input 
+              type="number" 
+              id="evmAmount" 
+              placeholder="0.001"
+              value="0.001"
+              step="0.001"
+              min="0"
+            />
+          </div>
+          
+          <button id="sendEvmBtn" class="btn evm" disabled>
+            Send ETH Transaction
+          </button>
+        </div>
+        
+        <div id="message"></div>
+      </div>
+    </div>
+
+    <script>
+      // DOM elements
+      const statusEl = document.getElementById('status');
+      const connectKaspaBtn = document.getElementById('connectKaspaBtn');
+      const connectEvmBtn = document.getElementById('connectEvmBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+      const walletInfo = document.getElementById('walletInfo');
+      const walletAddress = document.getElementById('walletAddress');
+      const walletBalance = document.getElementById('walletBalance');
+      const messageEl = document.getElementById('message');
+
+      // Tab elements
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+
+      // Transaction elements
+      const sendKaspaBtn = document.getElementById('sendKaspaBtn');
+      const sendKrc20Btn = document.getElementById('sendKrc20Btn');
+      const sendEvmBtn = document.getElementById('sendEvmBtn');
+
+      // State
+      let isConnected = false;
+      let currentAccount = null;
+      let currentChain = null;
+
+      // Utility functions
+      function shortenAddress(address) {
+        if (!address) return '';
+        if (address.startsWith('kaspa:')) {
+          return address.slice(0, 12) + '...' + address.slice(-8);
+        }
+        return address.slice(0, 6) + '...' + address.slice(-4);
+      }
+
+      function showMessage(text, type = 'success') {
+        messageEl.innerHTML = `<div class="${type}">${text}</div>`;
+        setTimeout(() => {
+          messageEl.innerHTML = '';
+        }, 5000);
+      }
+
+      function setLoading(button, isLoading) {
+        if (isLoading) {
+          button.disabled = true;
+          button.innerHTML = `<span class="loading"></span>${button.textContent}`;
+        } else {
+          button.disabled = false;
+          button.innerHTML = button.textContent.replace('<span class="loading"></span>', '');
+        }
+      }
+
+      // Update UI based on connection status
+      function updateUI() {
+        if (isConnected && currentAccount) {
+          statusEl.className = 'status connected';
+          statusEl.textContent = `✅ Connected to ${currentChain}`;
+          connectKaspaBtn.style.display = 'none';
+          connectEvmBtn.style.display = 'none';
+          disconnectBtn.style.display = 'block';
+          walletInfo.style.display = 'block';
+          walletAddress.textContent = currentAccount;
+          
+          // Enable appropriate transaction buttons
+          if (currentChain === 'kaspa') {
+            sendKaspaBtn.disabled = false;
+            sendKrc20Btn.disabled = false;
+            sendEvmBtn.disabled = true;
+          } else if (currentChain === 'evm') {
+            sendKaspaBtn.disabled = true;
+            sendKrc20Btn.disabled = true;
+            sendEvmBtn.disabled = false;
+          }
+        } else {
+          statusEl.className = 'status disconnected';
+          statusEl.textContent = '🔌 No wallet connected';
+          connectKaspaBtn.style.display = 'block';
+          connectEvmBtn.style.display = 'block';
+          disconnectBtn.style.display = 'none';
+          walletInfo.style.display = 'none';
+          sendKaspaBtn.disabled = true;
+          sendKrc20Btn.disabled = true;
+          sendEvmBtn.disabled = true;
+        }
+      }
+
+      // Connect KasWare wallet
+      async function connectKasWare() {
+        try {
+          setLoading(connectKaspaBtn, true);
+          
+          const result = await window.KasparexSDK.wallet.connect('kasware');
+          
+          isConnected = true;
+          currentAccount = result.address;
+          currentChain = 'kaspa';
+          
+          // Update balance display
+          if (result.balance) {
+            walletBalance.textContent = `Balance: ${result.balance} KAS`;
+          }
+          
+          updateUI();
+          showMessage(`Connected to KasWare: ${shortenAddress(currentAccount)}!`, 'success');
+          
+          console.log('KasWare connected:', result);
+        } catch (error) {
+          console.error('KasWare connection failed:', error);
+          showMessage(`KasWare connection failed: ${error.message}`, 'error');
+        } finally {
+          setLoading(connectKaspaBtn, false);
+        }
+      }
+
+      // Connect EVM wallet
+      async function connectEvm() {
+        try {
+          setLoading(connectEvmBtn, true);
+          
+          const result = await window.KasparexSDK.wallet.connect('evm');
+          
+          isConnected = true;
+          currentAccount = result.address;
+          currentChain = 'evm';
+          
+          // Update balance display
+          if (result.balance) {
+            walletBalance.textContent = `Balance: ${result.balance} ETH`;
+          }
+          
+          updateUI();
+          showMessage(`Connected to MetaMask: ${shortenAddress(currentAccount)}!`, 'success');
+          
+          console.log('EVM connected:', result);
+        } catch (error) {
+          console.error('EVM connection failed:', error);
+          showMessage(`EVM connection failed: ${error.message}`, 'error');
+        } finally {
+          setLoading(connectEvmBtn, false);
+        }
+      }
+
+      // Disconnect wallet
+      function disconnectWallet() {
+        window.KasparexSDK.wallet.disconnect();
+        isConnected = false;
+        currentAccount = null;
+        currentChain = null;
+        updateUI();
+        showMessage('Wallet disconnected', 'success');
+      }
+
+      // Send Kaspa transaction
+      async function sendKaspaTransaction() {
+        if (!isConnected || currentChain !== 'kaspa') {
+          showMessage('Please connect KasWare wallet first', 'error');
+          return;
+        }
+
+        const recipient = document.getElementById('kaspaRecipient').value.trim();
+        const amount = document.getElementById('kaspaAmount').value;
+        const feeRate = document.getElementById('kaspaFeeRate').value;
+
+        if (!recipient) {
+          showMessage('Please enter recipient address', 'error');
+          return;
+        }
+
+        if (!amount || parseFloat(amount) <= 0) {
+          showMessage('Please enter valid amount', 'error');
+          return;
+        }
+
+        try {
+          setLoading(sendKaspaBtn, true);
+          
+          const txHash = await window.KasparexSDK.wallet.sendTransaction(
+            recipient, 
+            amount, 
+            { feeRate: parseInt(feeRate) }
+          );
+
+          showMessage(`Kaspa transaction sent! Hash: ${txHash}`, 'success');
+          console.log('Kaspa transaction hash:', txHash);
+          
+        } catch (error) {
+          console.error('Kaspa transaction failed:', error);
+          showMessage(`Kaspa transaction failed: ${error.message}`, 'error');
+        } finally {
+          setLoading(sendKaspaBtn, false);
+        }
+      }
+
+      // Send KRC-20 token transaction
+      async function sendKrc20Transaction() {
+        if (!isConnected || currentChain !== 'kaspa') {
+          showMessage('Please connect KasWare wallet first', 'error');
+          return;
+        }
+
+        const tokenSymbol = document.getElementById('krc20Token').value;
+        const recipient = document.getElementById('krc20Recipient').value.trim();
+        const amount = document.getElementById('krc20Amount').value;
+
+        if (!recipient) {
+          showMessage('Please enter recipient address', 'error');
+          return;
+        }
+
+        if (!amount || parseFloat(amount) <= 0) {
+          showMessage('Please enter valid amount', 'error');
+          return;
+        }
+
+        try {
+          setLoading(sendKrc20Btn, true);
+          
+          const txHash = await window.KasparexSDK.wallet.sendToken(
+            tokenSymbol,
+            recipient,
+            amount
+          );
+
+          showMessage(`${tokenSymbol} transaction sent! Hash: ${txHash}`, 'success');
+          console.log('KRC-20 transaction hash:', txHash);
+          
+        } catch (error) {
+          console.error('KRC-20 transaction failed:', error);
+          showMessage(`KRC-20 transaction failed: ${error.message}`, 'error');
+        } finally {
+          setLoading(sendKrc20Btn, false);
+        }
+      }
+
+      // Send EVM transaction
+      async function sendEvmTransaction() {
+        if (!isConnected || currentChain !== 'evm') {
+          showMessage('Please connect EVM wallet first', 'error');
+          return;
+        }
+
+        const recipient = document.getElementById('evmRecipient').value.trim();
+        const amount = document.getElementById('evmAmount').value;
+
+        if (!recipient) {
+          showMessage('Please enter recipient address', 'error');
+          return;
+        }
+
+        if (!amount || parseFloat(amount) <= 0) {
+          showMessage('Please enter valid amount', 'error');
+          return;
+        }
+
+        try {
+          setLoading(sendEvmBtn, true);
+          
+          const txHash = await window.KasparexSDK.wallet.sendTransaction(recipient, amount);
+
+          showMessage(`ETH transaction sent! Hash: ${txHash}`, 'success');
+          console.log('EVM transaction hash:', txHash);
+          
+        } catch (error) {
+          console.error('EVM transaction failed:', error);
+          showMessage(`EVM transaction failed: ${error.message}`, 'error');
+        } finally {
+          setLoading(sendEvmBtn, false);
+        }
+      }
+
+      // Tab switching
+      function switchTab(tabName) {
+        tabs.forEach(tab => tab.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+      }
+
+      // Event listeners
+      connectKaspaBtn.addEventListener('click', connectKasWare);
+      connectEvmBtn.addEventListener('click', connectEvm);
+      disconnectBtn.addEventListener('click', disconnectWallet);
+      sendKaspaBtn.addEventListener('click', sendKaspaTransaction);
+      sendKrc20Btn.addEventListener('click', sendKrc20Transaction);
+      sendEvmBtn.addEventListener('click', sendEvmTransaction);
+
+      // Tab event listeners
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          switchTab(tab.dataset.tab);
+        });
+      });
+
+      // Listen for account changes
+      if (window.KasparexSDK?.wallet) {
+        window.KasparexSDK.wallet.onAccountChange((accounts) => {
+          if (accounts.length === 0) {
+            isConnected = false;
+            currentAccount = null;
+            currentChain = null;
+          } else {
+            currentAccount = accounts[0];
+          }
+          updateUI();
+        });
+
+        window.KasparexSDK.wallet.onChainChange((chainId) => {
+          console.log('Chain changed to:', chainId);
+          showMessage(`Network changed to: ${chainId}`, 'success');
+        });
+      }
+
+      // Initialize
+      updateUI();
+    </script>
   </body>
 </html>
